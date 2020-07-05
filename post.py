@@ -1,16 +1,22 @@
 import requests
 import json
 import time
+import base64
 
 params={
-    "name": "Foo",
-    "description": "An optional description",
-    "price": 45.2,
-    "tax": 3.5
+    "camera_no": "0",
+    "image": ""
 }
 
 
-url='http://127.0.0.1:8001/car_alarm'
+url='http://127.0.0.1:5000/car_alarm'
+
+image_file = 'car.jpg'
+
+with open (image_file,'rb') as f:
+    params['image'] = base64.b64encode(f.read()).decode()
+
+print(params['image'])
 
 time1=time.time()
 html = requests.post(url, json.dumps(params))
