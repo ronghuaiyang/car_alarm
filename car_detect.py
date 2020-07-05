@@ -21,7 +21,7 @@ class CarDetect():
 
     def infer(self, input_data):
         pred_sbbox, pred_mbbox, pred_lbbox = self.sess.run([self.model[1], self.model[2], self.model[3]],
-                                                            feed_dict={self.model[0]: image_data})
+                                                            feed_dict={self.model[0]: input_data})
         return pred_sbbox, pred_mbbox, pred_lbbox
 
 
@@ -72,12 +72,64 @@ def get_obj_num(bboxes, mask_path_list, obj_dic):
     return estimate
 
 
-def car_alarm(car_detect, cfg, mask_path_list, alarm_list):
+# def car_alarm(car_detect, cfg, mask_path_list, alarm_list):
 
-    img_file = get_latest_image(cfg['scene/' + cfg['camera_no']])
-    image = cv2.imread(img_file)
-    if image is None:
-        return
+#     img_file = get_latest_image(cfg['scene/' + cfg['camera_no']])
+#     image = cv2.imread(img_file)
+#     if image is None:
+#         return
+
+#     # input_data transform
+#     input_size = cfg['input_size']
+#     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+#     original_image = image
+#     original_image_size = original_image.shape[:2]
+#     image_data = utils.image_preporcess(np.copy(original_image), [input_size, input_size])
+#     image_data = image_data[np.newaxis, ...]
+
+#     # model infer
+#     pred_sbbox, pred_mbbox, pred_lbbox = car_detect.infer(image_data)
+
+#     # post process
+#     num_classes = cfg['num_classes']
+#     pred_bbox = np.concatenate([np.reshape(pred_sbbox, (-1, 5 + num_classes)),
+#                                 np.reshape(pred_mbbox, (-1, 5 + num_classes)),
+#                                 np.reshape(pred_lbbox, (-1, 5 + num_classes))], axis=0)
+#     bboxes = utils.postprocess_boxes(pred_bbox, original_image_size, input_size, 0.5)
+#     bboxes = utils.nms(bboxes, 0.45, method='nms')
+
+#     obj_dict = cfg['obj_dict']
+#     mask_dict = cfg['mask_dict']
+#     estimate = get_obj_num(bboxes, mask_path_list, obj_dict)
+#     judgement_matrix = [[0,1,1], #可停车区域
+#                         [1,1,1]] #不可停车区域
+
+#     mask_num, obj_num = estimate.shape
+#     alarm = 0
+#     for i, obj in obj_dict.items():
+#         for j, mask in mask_dict.items():
+#             if judgement_matrix[j][i] ==1 and estimate[j, i] !=0:
+#                 # print('在%s上有%d个%s' % (mask_dict[j], estimate[j, i], obj_dict[i][0]))
+#                 alarm = 1
+#             else:
+#                 alarm = 0
+    
+#     alarm_list.append(alarm)
+#     alarm_list.pop(0)
+
+#     if sum(alarm_list) >= cfg['alarm_range'] - 2:
+#         # call http service
+#         url = cfg['url']
+#         data = {"alram": 1}
+#         ret = requests.post(url, data=data)
+
+
+def car_alarm(image, car_detect, cfg, mask_path_list, alarm_list):
+
+    # img_file = get_latest_image(cfg['scene/' + cfg['camera_no']])
+    # image = cv2.imread(img_file)
+    # if image is None:
+    #     return
 
     # input_data transform
     input_size = cfg['input_size']
@@ -104,11 +156,12 @@ def car_alarm(car_detect, cfg, mask_path_list, alarm_list):
     judgement_matrix = [[0,1,1], #可停车区域
                         [1,1,1]] #不可停车区域
 
-    mask_num, obj_num = estimate.shape
+    # mask_num, obj_num = estimate.shape
+    # print(estimate.shape)
     alarm = 0
     for i, obj in obj_dict.items():
         for j, mask in mask_dict.items():
-            if judgement_matrix[j][i] ==1 and estimate[j, i] !=0:
+            if judgement_matrix[j][i] == 1 and estimate[j, i] !=0:
                 # print('在%s上有%d个%s' % (mask_dict[j], estimate[j, i], obj_dict[i][0]))
                 alarm = 1
             else:
@@ -119,9 +172,12 @@ def car_alarm(car_detect, cfg, mask_path_list, alarm_list):
 
     if sum(alarm_list) >= cfg['alarm_range'] - 2:
         # call http service
-        url = cfg['url']
-        data = {"alram": 1}
-        ret = requests.post(url, data=data)
+        # url = cfg['url']
+        # data = {"alram": 1}
+        # ret = requests.post(url, data=data)
+        return 1
+    else:
+        return 0
 
 
 

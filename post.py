@@ -9,14 +9,14 @@ params={
 }
 
 
-url='http://127.0.0.1:5000/car_alarm'
+url='http://127.0.0.1:5000/car_alarm_service'
 
 image_file = 'car.jpg'
 
 with open (image_file,'rb') as f:
     params['image'] = base64.b64encode(f.read()).decode()
 
-print(params['image'])
+# print(params['image'])
 
 time1=time.time()
 html = requests.post(url, json.dumps(params))

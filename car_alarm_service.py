@@ -32,8 +32,8 @@ def params_parse(item: Item):
     return camera_no, image
 
 
-@app.post("/car_alarm")
-async def car_alarm(item: Item):
+@app.post("/car_alarm_service")
+async def car_alarm_service(item: Item):
 
     try:
         camera_no, image = params_parse(item)
@@ -41,10 +41,10 @@ async def car_alarm(item: Item):
         print('params_parse error!')
         return -1
 
-    car_alarm(car_detect, cfg, mask_path_list, alarm_list)
+    ret = car_alarm(image, car_detect, cfg, mask_path_list, alarm_list)
     
 
-    return 0
+    return ret
 
 
 
