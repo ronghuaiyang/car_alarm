@@ -9,6 +9,7 @@ params={
 }
 
 
+# url='http://127.0.0.1:5000/car_alarm_service'
 url='http://127.0.0.1:5000/car_alarm_service'
 
 image_file = 'car.jpg'

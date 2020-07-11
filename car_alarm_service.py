@@ -5,13 +5,15 @@ import base64
 import cv2
 import numpy as np
 import yaml
-
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 from car_detect import CarDetect, car_alarm, get_files
 
 
 app = FastAPI()
 
-with open('config.yaml') as f:
+with open('config.yaml', encoding='utf-8') as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader)
 
 alarm_list = [0]*cfg['alarm_range']
@@ -38,7 +40,7 @@ async def car_alarm_service(item: Item):
     try:
         camera_no, image = params_parse(item)
     except:
-        print('params_parse error!')
+        logging.error('params_parse error!')
         return -1
 
     ret = car_alarm(image, car_detect, cfg, mask_path_list, alarm_list)
@@ -49,12 +51,4 @@ async def car_alarm_service(item: Item):
 
 
 if __name__ == '__main__':
-    # with open('config.yaml') as f:
-    #     cfg = yaml.load(f, Loader=yaml.FullLoader)
-
-    # alarm_list = [0]*cfg['alarm_range']
-    # car_detect = CarDetect(cfg)
-
-
-
     uvicorn.run(app, host="127.0.0.1", port=5000, log_level="info")

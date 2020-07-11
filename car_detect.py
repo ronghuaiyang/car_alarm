@@ -132,6 +132,7 @@ def car_alarm(image, car_detect, cfg, mask_path_list, alarm_list):
     #     return
 
     # input_data transform
+    # 
     input_size = cfg['input_size']
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     original_image = image
@@ -142,7 +143,7 @@ def car_alarm(image, car_detect, cfg, mask_path_list, alarm_list):
     # model infer
     pred_sbbox, pred_mbbox, pred_lbbox = car_detect.infer(image_data)
 
-    # post process
+    # post process get final bboxes
     num_classes = cfg['num_classes']
     pred_bbox = np.concatenate([np.reshape(pred_sbbox, (-1, 5 + num_classes)),
                                 np.reshape(pred_mbbox, (-1, 5 + num_classes)),
@@ -150,34 +151,28 @@ def car_alarm(image, car_detect, cfg, mask_path_list, alarm_list):
     bboxes = utils.postprocess_boxes(pred_bbox, original_image_size, input_size, 0.5)
     bboxes = utils.nms(bboxes, 0.45, method='nms')
 
+    # set judgement_matrix and estimate
     obj_dict = cfg['obj_dict']
     mask_dict = cfg['mask_dict']
     estimate = get_obj_num(bboxes, mask_path_list, obj_dict)
     judgement_matrix = [[0,1,1], #可停车区域
                         [1,1,1]] #不可停车区域
 
-    # mask_num, obj_num = estimate.shape
-    # print(estimate.shape)
     alarm = 0
     for i, obj in obj_dict.items():
         for j, mask in mask_dict.items():
             if judgement_matrix[j][i] == 1 and estimate[j, i] !=0:
                 # print('在%s上有%d个%s' % (mask_dict[j], estimate[j, i], obj_dict[i][0]))
                 alarm = 1
-            else:
-                alarm = 0
-    
-    alarm_list.append(alarm)
-    alarm_list.pop(0)
 
-    if sum(alarm_list) >= cfg['alarm_range'] - 2:
-        # call http service
-        # url = cfg['url']
-        # data = {"alram": 1}
-        # ret = requests.post(url, data=data)
-        return 1
-    else:
-        return 0
+    res = {'alarm': alarm}
+
+    objs = []
+    for bbox in bboxes:
+        objs.append({'x1':bbox[0], 'y1':bbox[1], 'x2':bbox[2], 'y2':bbox[3], 'confidence':bbox[4], 'class':bbox[5]})
+    res['objs'] = objs 
+
+    return res
 
 
 
