@@ -151,22 +151,22 @@ def car_alarm(image, car_detect, cfg, mask_path_list, alarm_list):
     bboxes = utils.postprocess_boxes(pred_bbox, original_image_size, input_size, 0.5)
     bboxes = utils.nms(bboxes, 0.45, method='nms')
 
-    # set judgement_matrix and estimate
-    obj_dict = cfg['obj_dict']
-    mask_dict = cfg['mask_dict']
-    estimate = get_obj_num(bboxes, mask_path_list, obj_dict)
-    judgement_matrix = [[0,1,1], #可停车区域
-                        [1,1,1]] #不可停车区域
+    # # set judgement_matrix and estimate
+    # obj_dict = cfg['obj_dict']
+    # mask_dict = cfg['mask_dict']
+    # estimate = get_obj_num(bboxes, mask_path_list, obj_dict)
+    # judgement_matrix = [[0,1,1], #可停车区域
+    #                     [1,1,1]] #不可停车区域
 
-    alarm = 0
-    for i, obj in obj_dict.items():
-        for j, mask in mask_dict.items():
-            if judgement_matrix[j][i] == 1 and estimate[j, i] !=0:
-                # print('在%s上有%d个%s' % (mask_dict[j], estimate[j, i], obj_dict[i][0]))
-                alarm = 1
+    # alarm = 0
+    # for i, obj in obj_dict.items():
+    #     for j, mask in mask_dict.items():
+    #         if judgement_matrix[j][i] == 1 and estimate[j, i] !=0:
+    #             # print('在%s上有%d个%s' % (mask_dict[j], estimate[j, i], obj_dict[i][0]))
+    #             alarm = 1
 
-    res = {'alarm': alarm}
-
+    # res = {'alarm': alarm}
+    res = {}
     objs = []
     for bbox in bboxes:
         objs.append({'x1':bbox[0], 'y1':bbox[1], 'x2':bbox[2], 'y2':bbox[3], 'confidence':bbox[4], 'class':bbox[5]})

@@ -4,18 +4,18 @@ import time
 import base64
 
 params1={
-    "camera_no": "0",
+    "camera_no": "01",
     "image": ""
 }
 
 params2={
-    "camera_no": "0",
+    "camera_no": "01",
     "objs": []
 }
 
 
 # url='http://127.0.0.1:5000/car_alarm_service'
-url1='http://127.0.0.1:5000/car_alarm_service'
+url1='http://127.0.0.1:5000/obj_detect_service'
 url2='http://127.0.0.1:5001/alarm_decision_service'
 
 
