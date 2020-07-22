@@ -109,12 +109,11 @@ async def alarm_decision_service(item: Item):
 
     try:
         camera_no, bboxes = params_parse(item)
-    except:
-        logging.error('params_parse error!')
-        return -1
+    except Exception as e:
+        s = str(e)
+        logging.error(s)
+        return {'error':s}
     
-    # print(camera_no, bboxes)
-
     mask_path_list = mask_dir_dict[camera_no]
     status_queue = status_queues[int(camera_no)]
     

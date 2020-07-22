@@ -15,6 +15,7 @@ import core.utils as utils
 
 return_elements = ["input/input_data:0", "pred_sbbox/concat_2:0", "pred_mbbox/concat_2:0", "pred_lbbox/concat_2:0"]
 pb_file = "./yolov3_coco.pb"
+
 class ObjDetectInfer():
 
     def __init__(self, cfg):
@@ -84,9 +85,13 @@ async def obj_detect_service(item: Item):
 
     try:
         camera_no, image = params_parse(item)
-    except:
-        logging.error('params_parse error!')
-        return -1
+    except Exception as e:
+        s = str(e)
+        logging.error(s)
+        return {'error':s}
+
+    if image is None:
+        return {'error':'invalid image data'}
 
     ret = obj_detect(image)
 
